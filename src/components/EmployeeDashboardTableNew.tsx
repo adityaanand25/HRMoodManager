@@ -43,16 +43,20 @@ export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ 
       setError(null);
       const scores = await getBurnoutScores();
       
-      // Handle both array and object responses
-      const scoresArray = Array.isArray(scores) ? scores : 
-        typeof scores === 'object' ? Object.entries(scores).map(([name, score]) => ({ name, score })) : [];
+      let scoresArray: {name: string, score: any}[] = [];
+
+      if (Array.isArray(scores)) {
+        scoresArray = scores;
+      } else if (scores && typeof scores === 'object') {
+        scoresArray = Object.entries(scores).map(([name, score]) => ({ name, score }));
+      }
       
       setEmployees(prevEmployees => 
-        scoresArray.map((emp: any) => {
+        scoresArray.map(emp => {
           const existing = prevEmployees.find(e => e.name === emp.name);
           return {
             name: emp.name,
-            score: typeof emp.score === 'number' ? emp.score : (typeof emp === 'number' ? emp : 0),
+            score: typeof emp.score === 'number' ? emp.score : 0,
             mood: existing?.mood,
             suggestion: existing?.suggestion,
             isCheckingMood: false,
@@ -62,7 +66,7 @@ export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ 
       );
       setLastUpdated(new Date());
     } catch (err) {
-      setError('Failed to fetch employee data');
+      setError('Failed to fetch employee data. The backend server might be offline.');
       console.error('Error fetching employee data:', err);
     } finally {
       setLoading(false);

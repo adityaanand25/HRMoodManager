@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getBurnoutScores, getMood } from '../services/api';
+import { enhancedApi } from '../services/enhancedApi';
 
 interface Employee {
   name: string;
@@ -26,7 +26,7 @@ export const EmployeeDashboard: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const scores = await getBurnoutScores();
+      const scores = await enhancedApi.getBurnoutScores();
       
       // Transform API response to Employee array
       const employeeList = Array.isArray(scores) 
@@ -61,7 +61,7 @@ export const EmployeeDashboard: React.FC = () => {
       );
 
       // Get mood from API
-      const moodResult = await getMood(employeeName);
+      const moodResult = await enhancedApi.getMood(employeeName);
       
       // Get HR suggestion
       const employee = employees.find(emp => emp.name === employeeName);
