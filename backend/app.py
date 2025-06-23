@@ -3,12 +3,15 @@ import os
 from datetime import datetime
 from flask import Flask, request, jsonify  # Flask for building the API
 from flask_cors import CORS  # CORS to allow cross-origin requests from the frontend
-from flask_socketio import SocketIO, emit
+# Flask-SocketIO temporarily disabled due to version conflicts
+# from flask_socketio import SocketIO, emit, send
 from burnout_analysis import analyze_work_patterns  # Function to calculate burnout scores
 from mood_analysis import detect_mood  # Function to detect mood
 from database import init_database, save_mood_data, save_suggestion, get_trends_data, get_daily_aggregates  # Database functions
 
-# Import new advanced modules
+# Import new advanced modules (temporarily disabled for debugging)
+ADVANCED_FEATURES = False
+"""
 try:
     from advanced_analytics import PredictiveBurnoutAnalysis, SentimentAnalysis as SentimentAnalyzer, TeamAnalytics
     from smart_notifications import SmartNotificationSystem
@@ -20,15 +23,16 @@ try:
 except ImportError as e:
     print(f"Advanced features not available: {e}")
     ADVANCED_FEATURES = False
+"""
 
 # Initialize the Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes to allow frontend communication
 
-# Initialize SocketIO for real-time features
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Real-time features temporarily disabled due to SocketIO version conflicts
 
-# Initialize advanced systems
+# Initialize advanced systems (temporarily disabled for debugging)
+"""
 if ADVANCED_FEATURES:
     predictive_analytics = PredictiveBurnoutAnalysis()
     sentiment_analyzer = SentimentAnalyzer()
@@ -37,6 +41,7 @@ if ADVANCED_FEATURES:
     gamification = GamificationSystem()
     voice_analyzer = VoiceWellnessAnalyzer()
     voice_detector = VoiceMoodDetector()
+"""
 
 # Initialize the database when the app starts
 init_database()
@@ -78,30 +83,12 @@ def mood_api():
     csv_path = os.path.join(dir_path, 'employee_logs.csv')
     scores_dict = analyze_work_patterns(csv_path)
     burnout_score = scores_dict.get(name, 50)  # Default to 50 if not found
-    
-    # Detect the mood (mock implementation)
+      # Detect the mood (mock implementation)
     mood = detect_mood(name)
-    
     # Save mood and burnout data to database
     save_mood_data(name, burnout_score, mood)
-    
-    # Emit real-time update via WebSocket
-    socketio.emit('mood_update', {
-        'employee_name': name,
-        'mood': mood,
-        'burnout_score': burnout_score,
-        'timestamp': datetime.now().isoformat()
-    })
-    
-    # Also trigger the mood_update_realtime event for other listeners
-    socketio.emit('live_mood_update', {
-        'employee_name': name,
-        'mood': mood,
-        'burnout_score': burnout_score,
-        'timestamp': datetime.now().isoformat()
-    })
-    
-    print(f"Mood update broadcasted for {name}: {mood} (burnout: {burnout_score})")
+    # Real-time updates temporarily disabled due to SocketIO issues
+    print(f"Mood update for {name}: {mood} (burnout: {burnout_score})")
     
     return jsonify({"name": name, "mood": mood, "burnout_score": burnout_score})
 
@@ -274,19 +261,51 @@ def smart_notifications():
         employee_name = data.get('employee_name')
         mood = data.get('mood')
         burnout_score = data.get('burnout_score', 50)
-          # Generate smart notifications (fallback implementation)
+        
+        # Generate smart notifications (fallback implementation)
         notifications = []
+        import datetime
+        current_time = datetime.datetime.now().isoformat()
+        
         if burnout_score < 30:
             notifications.append({
                 "type": "critical_alert",
-                "message": f"Critical burnout alert for {employee_name}",
-                "priority": "high"
+                "priority": 1,
+                "title": "🚨 Critical Wellness Alert",
+                "message": f"Critical burnout detected for {employee_name}. Immediate intervention required.",
+                "actions": ["Schedule immediate meeting", "Contact EAP", "Assign wellness coach"],
+                "timestamp": current_time,
+                "requires_acknowledgment": True
             })
         elif burnout_score < 60:
             notifications.append({
                 "type": "wellness_check",
-                "message": f"Wellness check recommended for {employee_name}",
-                "priority": "medium"
+                "priority": 2,
+                "title": "⚠️ Wellness Check Recommended",
+                "message": f"Wellness check recommended for {employee_name}. Consider support options.",
+                "actions": ["Schedule check-in", "Review workload", "Offer flexible hours"],
+                "timestamp": current_time,
+                "requires_acknowledgment": False
+            })
+        elif mood in ['stressed', 'sad', 'angry']:
+            notifications.append({
+                "type": "mood_support",
+                "priority": 3,
+                "title": "💙 Mood Support Available",
+                "message": f"{employee_name} is experiencing {mood} mood. Support resources available.",
+                "actions": ["Send resources", "Offer counseling", "Team check-in"],
+                "timestamp": current_time,
+                "requires_acknowledgment": False
+            })
+        else:
+            notifications.append({
+                "type": "wellness_reminder",
+                "priority": 4,
+                "title": "🌟 Keep up the great work!",
+                "message": f"{employee_name} is maintaining good wellness. Continue positive practices.",
+                "actions": ["Send appreciation", "Share success"],
+                "timestamp": current_time,
+                "requires_acknowledgment": False
             })
         
         return jsonify({
@@ -307,27 +326,34 @@ def gamification_profile():
             
         employee_name = request.args.get('employee_name', 'Unknown')
         
-        # Get gamification profile (fallback implementation)
-        profile = {
-            "employee_name": employee_name,
-            "level": 3,
-            "points": 150,
-            "badges": ["mood_tracker", "consistency_champion"],
-            "current_challenges": [
-                {"name": "Daily Mood Tracker", "progress": 75, "target": 100}
-            ],
-            "wellness_streak": 5,
-            "leaderboard_position": 12
-        }
+        # Generate realistic gamification data
+        import random
+        wellness_score = random.randint(60, 95)
+        current_streak = random.randint(0, 15)
+        leaderboard_position = random.randint(1, 25)
+        
+        # Sample achievements
+        all_achievements = [
+            {"badge": "mood_tracker", "earned_date": "2024-12-01", "description": "Completed 7 mood check-ins"},
+            {"badge": "wellness_champion", "earned_date": "2024-12-05", "description": "Maintained high wellness for a week"},
+            {"badge": "team_supporter", "earned_date": "2024-12-10", "description": "Helped team members with wellness tips"}
+        ]
+        
+        # Randomly select some achievements
+        num_achievements = random.randint(0, len(all_achievements))
+        achievements = random.sample(all_achievements, num_achievements)
         
         return jsonify({
             "employee_name": employee_name,
-            "level": profile.get('level', 1),
-            "points": profile.get('points', 0),
-            "badges": profile.get('badges', []),
-            "current_challenges": profile.get('current_challenges', []),
-            "wellness_streak": profile.get('wellness_streak', 0),
-            "leaderboard_position": profile.get('leaderboard_position', 999)
+            "wellness_score": wellness_score,
+            "current_streak": current_streak,
+            "achievements": achievements,
+            "next_badge": {
+                "badge": "resilience_star",
+                "name": "Resilience Star", 
+                "description": "Handle stress effectively for 2 weeks"
+            },
+            "leaderboard_position": leaderboard_position
         })
         
     except Exception as e:
@@ -408,26 +434,23 @@ def analyze_voice_mood():
         traceback.print_exc()
         return jsonify({"error": f"Failed to analyze voice mood: {str(e)}"}), 500
 
-# WebSocket events for real-time updates
-@socketio.on('connect')
+# WebSocket events for real-time updates (temporarily disabled)
+# Note: SocketIO handlers disabled due to version conflicts
+
+# Real-time event handlers temporarily disabled
 def handle_connect():
-    print('Client connected to real-time updates')
-    emit('connection_status', {'status': 'connected'})
+    print('Client connected to real-time updates (SocketIO disabled)')
 
-@socketio.on('disconnect')
 def handle_disconnect():
-    print('Client disconnected from real-time updates')
+    print('Client disconnected from real-time updates (SocketIO disabled)')
 
-@socketio.on('subscribe_updates')
 def handle_subscribe(data):
     employee_name = data.get('employee_name')
-    print(f'Subscribed {employee_name} to real-time updates')
-    emit('subscription_confirmed', {'employee_name': employee_name})
+    print(f'Subscribed {employee_name} to real-time updates (SocketIO disabled)')
 
-@socketio.on('mood_update_realtime')
 def handle_realtime_mood_update(data):
-    # Broadcast mood update to all connected clients
-    emit('live_mood_update', data, broadcast=True)
+    # Real-time broadcasting temporarily disabled
+    print("Real-time mood update received but SocketIO disabled")
     
     # Check for alerts and notifications
     if ADVANCED_FEATURES:
@@ -444,12 +467,9 @@ def handle_realtime_mood_update(data):
                 "priority": "high"
             })
         
-        if notifications:
-            emit('smart_notification', {
-                'employee_name': employee_name,
-                'notifications': notifications
-            }, broadcast=True)
+        print(f"Generated notifications for {employee_name}: {notifications}")
 
-# Run the Flask app with SocketIO support
+# Run the Flask app
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    # SocketIO temporarily disabled due to version conflicts
+    app.run(debug=True, host='0.0.0.0', port=5000)
