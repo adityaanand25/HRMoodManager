@@ -9,7 +9,6 @@ interface LoginPageProps {
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'HR' | 'Admin'>('HR');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,11 +16,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication
+    // Simulate authentication - always create HR user since Admin is removed
     setTimeout(() => {
       const user: UserType = {
-        name: role === 'HR' ? 'Sarah Wilson' : 'Admin User',
-        role,
+        name: 'Sarah Wilson',
+        role: 'HR',
         email
       };
       onLogin(user);
@@ -43,31 +42,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => setRole('HR')}
-              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                role === 'HR'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              HR Manager
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('Admin')}
-              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                role === 'Admin'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Admin
-            </button>
-          </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
@@ -118,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             ) : (
               <div className="flex items-center justify-center space-x-2">
                 <User size={18} />
-                <span>Sign In</span>
+                <span>Sign In as HR Manager</span>
               </div>
             )}
           </button>

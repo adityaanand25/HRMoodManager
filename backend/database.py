@@ -139,6 +139,10 @@ def get_daily_aggregates():
     
     return daily_data
 
+def get_connection():
+    """Get a database connection."""
+    return sqlite3.connect(DB_PATH)
+
 # Initialize database when module is imported
 if __name__ == '__main__':
     init_database()
