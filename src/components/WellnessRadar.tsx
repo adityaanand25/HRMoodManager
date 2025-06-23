@@ -59,11 +59,10 @@ export const WellnessRadar: React.FC<WellnessRadarProps> = ({
       setLoading(false);
     }
   };
-
   const RadarChart = ({ data }: { data: WellnessMetric[] }) => {
-    const size = 200;
+    const size = 280; // Increased from 200 for better visibility
     const center = size / 2;
-    const radius = 80;
+    const radius = Math.min(size * 0.35, 100); // Responsive radius
     const angleStep = (2 * Math.PI) / data.length;
 
     // Calculate points for the radar chart
@@ -145,21 +144,21 @@ export const WellnessRadar: React.FC<WellnessRadarProps> = ({
           {metric.category}
         </text>
       );
-    });
-
-    return (
-      <svg width={size} height={size} className="mx-auto">
-        {gridCircles}
-        {gridLines}
-        <polygon
-          points={polygonPoints}
-          fill="rgba(139, 92, 246, 0.1)"
-          stroke="#8B5CF6"
-          strokeWidth="2"
-        />
-        {dataPoints}
-        {labels}
-      </svg>
+    });    return (
+      <div className="w-full max-w-sm mx-auto">
+        <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-auto max-h-80">
+          {gridCircles}
+          {gridLines}
+          <polygon
+            points={polygonPoints}
+            fill="rgba(139, 92, 246, 0.1)"
+            stroke="#8B5CF6"
+            strokeWidth="2"
+          />
+          {dataPoints}
+          {labels}
+        </svg>
+      </div>
     );
   };
 

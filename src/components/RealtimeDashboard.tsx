@@ -65,41 +65,16 @@ export const RealtimeDashboard: React.FC<RealtimeDashboardProps> = ({ onEmployee
       setLoading(false);
     }
   }, []);
-
   // Set up WebSocket connection for real-time updates
   useEffect(() => {
-    // Set up WebSocket listeners
-    const handleConnectionStatus = (data: any) => {
-      setIsConnected(data.connected);
-    };
+    // WebSocket temporarily disabled due to backend compatibility issues
+    // Using polling instead for real-time updates
+    console.log('WebSocket disabled - using polling for real-time data');
+    setIsConnected(false);
 
-    const handleMoodUpdate = (data: any) => {
-      console.log('Real-time mood update:', data);
-      // Refresh data when mood updates are received
-      fetchRealtimeData();
-    };
-
-    const handleNotification = (data: any) => {
-      console.log('Real-time notification:', data);
-      // Refresh data when notifications are received
-      fetchRealtimeData();
-    };
-
-    // Subscribe to WebSocket events
-    webSocketService.on('connection_status', handleConnectionStatus);
-    webSocketService.on('mood_update', handleMoodUpdate);
-    webSocketService.on('live_mood_update', handleMoodUpdate);
-    webSocketService.on('notification', handleNotification);
-
-    // Initial connection status
-    setIsConnected(webSocketService.isConnected());
-
-    // Cleanup on unmount
+    // Cleanup on unmount (placeholder)
     return () => {
-      webSocketService.off('connection_status', handleConnectionStatus);
-      webSocketService.off('mood_update', handleMoodUpdate);
-      webSocketService.off('live_mood_update', handleMoodUpdate);
-      webSocketService.off('notification', handleNotification);
+      console.log('WebSocket cleanup - disabled');
     };
   }, [fetchRealtimeData]);
 

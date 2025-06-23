@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Brain } from 'lucide-react';
 import { Navigation } from './Navigation';
 import { SummaryCards } from './SummaryCards';
 import { MoodChart } from './MoodChart';
 import { QuietQuitDetector } from './QuietQuitDetector';
 import { EmployeeDashboardTable } from './EmployeeDashboardTableNew';
-import { RealtimeDashboard } from './RealtimeDashboard';
 import { GamificationPanel } from './GamificationPanel';
 import { SmartNotificationsPanel } from './SmartNotificationsPanel';
 import { VoiceMoodAnalyzer } from './VoiceMoodAnalyzer';
@@ -14,9 +14,11 @@ import { WellnessRadar } from './WellnessRadar';
 import { BiometricIntegration } from './BiometricIntegration';
 import { TeamDynamicsAnalyzer } from './TeamDynamicsAnalyzer';
 import { WellnessChatbot } from './WellnessChatbot';
+import { RealtimeAnalyticsFeed } from './RealtimeAnalyticsFeed';
 import { User } from '../types';
 import { dashboardStats, moodTrendData } from '../data/mockData';
 import { enhancedApi } from '../services/enhancedApi';
+import { EnhancedDashboard } from './EnhancedDashboard';
 
 interface EnhancedDashboardPageProps {
   user: User;
@@ -191,154 +193,103 @@ export const EnhancedDashboardPage: React.FC<EnhancedDashboardPageProps> = ({
           </div>
         </div>        {/* Tab Content */}
         {activeTab === 'overview' && (
-          <div className="space-y-8">
-            <SummaryCards stats={getDynamicStats()} />
+          <div className="w-full space-y-8">
+            {/* Team Overview */}
+            <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Team Overview</h3>
+              <SummaryCards stats={getDynamicStats()} />
+            </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              <div className="xl:col-span-2">
-                <MoodChart data={moodTrendData} title="Team Mood Trends (7 Days)" />
-              </div>
+            {/* Mood Trends */}
+            <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Mood Trends</h3>
+              <MoodChart data={moodTrendData} title="Team Mood Trends (7 Days)" />
+            </div>
+            
+            {/* Quiet Quitting Risk */}
+            <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Quiet Quitting Risk</h3>
               <QuietQuitDetector />
             </div>
 
-            <EmployeeDashboardTable onDataUpdate={handleEmployeeDataUpdate} />
+            {/* Employee Dashboard */}
+            <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Employee Dashboard</h3>
+              <EmployeeDashboardTable onDataUpdate={handleEmployeeDataUpdate} />
+            </div>
           </div>
         )}
 
         {activeTab === 'realtime' && (
+          <EnhancedDashboard />
+        )}        {activeTab === 'analytics' && (
           <div className="space-y-8">
-            {/* Real-time Overview */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              <div className="xl:col-span-2">
-                <RealtimeDashboard onEmployeeSelect={handleEmployeeSelect} />
+            {/* Analytics Header */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border border-gray-100">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <Brain className="text-purple-600" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">AI-Powered Analytics</h3>
+                  <p className="text-gray-600">Real-time insights and predictive analytics</p>
+                </div>
               </div>
-              <SentimentHeatmap />
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <SmartNotificationsPanel 
-                employeeName={selectedEmployee}
-                onNotificationAction={handleNotificationAction}
-              />
+
+            {/* Analytics Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {/* Predictive Insights */}
+              <PredictiveInsights className="xl:col-span-1" />
               
-              {selectedEmployee && (
-                <GamificationPanel 
-                  employeeName={selectedEmployee}
-                  onAchievementUnlocked={(achievement) => {
-                    console.log('New achievement unlocked:', achievement);
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        )}
+              {/* Real-time Activity Feed */}
+              <RealtimeAnalyticsFeed className="xl:col-span-1" />
 
-        {activeTab === 'analytics' && (
-          <div className="space-y-8">
-            {/* AI Insights Header */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                🤖 AI-Powered Analytics Dashboard
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-2">🔮 Predictive Analytics</h4>
-                  <p className="text-sm text-gray-600">
-                    AI identifies burnout risk 3-4 weeks before traditional indicators
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-2">📊 Pattern Recognition</h4>
-                  <p className="text-sm text-gray-600">
-                    Advanced algorithms detect mood patterns and workplace correlations
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-2">💡 Smart Recommendations</h4>
-                  <p className="text-sm text-gray-600">
-                    Personalized interventions based on individual employee profiles
-                  </p>
-                </div>
-              </div>
+              {/* Sentiment Heatmap */}
+              <SentimentHeatmap className="xl:col-span-2" />
             </div>
 
-            {/* Advanced Analytics Components */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <PredictiveInsights />
+            {/* Team Analytics Overview */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Team Analytics Overview</h3>
               <TeamDynamicsAnalyzer />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <SentimentHeatmap />
-              <RealtimeDashboard onEmployeeSelect={handleEmployeeSelect} />
+            {/* Wellness Radar */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Employee Wellness Analysis</h3>
+              <WellnessRadar selectedEmployee="Team Average" />
             </div>
           </div>
         )}
 
         {activeTab === 'wellness' && (
           <div className="space-y-8">
-            {/* Employee Selector */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">🎯 Personal Wellness Dashboard</h3>
-              <div className="flex items-center space-x-4">
-                <label className="text-sm font-medium text-gray-700">Select Employee:</label>
-                <select
-                  value={selectedEmployee}
-                  onChange={(e) => setSelectedEmployee(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Choose an employee...</option>
-                  {employeeData.map((employee) => (
-                    <option key={employee.name} value={employee.name}>
-                      {employee.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-4">Wellness Tools</h3>
+              <p className="text-gray-600">Gamification, resources, and other wellness tools will be available here.</p>
+              {/* Placeholder for future wellness components */}
             </div>
-
-            {selectedEmployee ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-8">
-                {/* Personal Wellness Overview */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <WellnessRadar selectedEmployee={selectedEmployee} />
-                  <BiometricIntegration employeeName={selectedEmployee} />
-                </div>
-
-                {/* Wellness Tools */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <VoiceMoodAnalyzer 
-                    onMoodDetected={handleMoodDetected}
-                    isEnabled={true}
-                  />
-
-                  <GamificationPanel 
-                    employeeName={selectedEmployee}
-                    onAchievementUnlocked={(achievement) => {
-                      console.log('Achievement unlocked:', achievement);
-                    }}
-                  />
-                </div>
-
-                {/* Smart Insights */}
-                <SmartNotificationsPanel 
+                <VoiceMoodAnalyzer 
                   employeeName={selectedEmployee}
-                  onNotificationAction={handleNotificationAction}
+                  onMoodDetected={handleMoodDetected} 
+                  isEnabled={!!selectedEmployee}
+                />
+                {selectedEmployee && <GamificationPanel employeeName={selectedEmployee} />}
+                <BiometricIntegration />
+              </div>
+              <div className="space-y-8">
+                <SmartNotificationsPanel 
+                  notifications={notifications}
+                  onAction={handleNotificationAction}
                 />
               </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-                <div className="text-6xl mb-4">🎯</div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">Select an Employee</h3>
-                <p className="text-gray-600">
-                  Choose an employee from the dropdown above to access personalized wellness tools
-                </p>
-              </div>
-            )}
+            </div>
           </div>
         )}
-
-        {/* AI Wellness Chatbot - Always Available */}
+        
         <WellnessChatbot />
 
         {/* Enhanced Floating Action Menu */}

@@ -3,7 +3,7 @@ import { Navigation } from './Navigation';
 import { SummaryCards } from './SummaryCards';
 import { MoodChart } from './MoodChart';
 import { QuietQuitDetector } from './QuietQuitDetector';
-import { EmployeeDashboardTable } from './EmployeeDashboardTableNew';
+import { EmployeeDashboardTable } from './EmployeeDashboardTable';
 import { User } from '../types';
 import { dashboardStats, moodTrendData } from '../data/mockData';
 

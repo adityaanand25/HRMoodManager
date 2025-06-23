@@ -189,9 +189,7 @@ export const EmployeeDashboard: React.FC = () => {
         <p className="text-gray-600">
           Monitor team burnout levels and mood in real-time
         </p>
-      </div>
-
-      {/* Summary Cards */}
+      </div>      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center">
@@ -243,9 +241,7 @@ export const EmployeeDashboard: React.FC = () => {
               {loading ? 'Refreshing...' : 'Refresh Data'}
             </button>
           </div>
-        </div>
-
-        <div className="overflow-x-auto">
+        </div>        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -265,8 +261,7 @@ export const EmployeeDashboard: React.FC = () => {
                   Actions
                 </th>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            </thead>            <tbody className="bg-white divide-y divide-gray-200">
               {employees.map((employee) => (
                 <tr key={employee.name} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -325,8 +320,7 @@ export const EmployeeDashboard: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+          </table>        </div>
 
         {employees.length === 0 && !loading && (
           <div className="px-6 py-12 text-center">

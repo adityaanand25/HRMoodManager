@@ -67,8 +67,8 @@ export const MoodChart: React.FC<MoodChartProps> = ({ data, title }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div style={{ height: '300px' }}>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+      <div className="h-64 sm:h-80 md:h-96">
         <Line data={chartData} options={options} />
       </div>
     </div>

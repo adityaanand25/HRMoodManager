@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Play, Square, Volume2, Activity } from 'lucide-react';
-import { analyzeVoiceMood } from '../services/enhancedApi';
+import { enhancedApi } from '../services/enhancedApi';
 
 interface VoiceMoodAnalyzerProps {
   onMoodDetected?: (mood: string, confidence: number) => void;
@@ -107,7 +107,7 @@ export const VoiceMoodAnalyzer: React.FC<VoiceMoodAnalyzerProps> = ({
       setIsAnalyzing(true);
       setError(null);
 
-      const result = await analyzeVoiceMood(audioBlob, employeeName);
+      const result = await enhancedApi.analyzeVoiceMood(audioBlob, employeeName);
       
       if (result.error) {
         setError(result.error);

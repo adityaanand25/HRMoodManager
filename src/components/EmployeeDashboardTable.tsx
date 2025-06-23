@@ -12,9 +12,10 @@ interface EmployeeData {
 
 interface EmployeeDashboardTableProps {
   onOpenMoodModal?: (employeeName: string, onMoodDetected: (mood: string) => void) => void;
+  onDataUpdate?: (employees: EmployeeData[]) => void;
 }
 
-export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ onOpenMoodModal }) => {
+export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ onOpenMoodModal, onDataUpdate }) => {
   const [employees, setEmployees] = useState<EmployeeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +24,12 @@ export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ 
     fetchEmployeeData();
   }, []);
 
+  // Update parent component when employees data changes
+  useEffect(() => {
+    if (onDataUpdate && employees.length > 0) {
+      onDataUpdate(employees);
+    }
+  }, [employees, onDataUpdate]);
   const fetchEmployeeData = async () => {
     try {
       setLoading(true);
@@ -39,8 +46,9 @@ export const EmployeeDashboardTable: React.FC<EmployeeDashboardTableProps> = ({ 
         isCheckingMood: false,
         isGettingSuggestion: false,
       })));
-    } catch (err) {
-      setError('Failed to fetch employee data');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to fetch employee data';
+      setError(`Backend Error: ${errorMessage}. Please check if the backend server is running on http://127.0.0.1:5001`);
       console.error('Error fetching employee data:', err);
     } finally {
       setLoading(false);

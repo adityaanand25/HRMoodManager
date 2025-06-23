@@ -1,5 +1,5 @@
 // Enhanced API service with advanced features
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = 'http://127.0.0.1:5002/api';
 
 // Enhanced API with caching and retry logic
 class EnhancedApiService {
@@ -103,15 +103,10 @@ class EnhancedApiService {
   }
 
   // 🚀 NEW ADVANCED API METHODS
-
   async getRealtimeDashboard(): Promise<any> {
-    try {
-      const data = await this.fetchWithRetry(`${API_BASE_URL}/realtime/dashboard`);
-      return data;
-    } catch (error) {
-      console.warn('Advanced features not available, using fallback');
-      return this.getFallbackDashboard();
-    }
+    // API endpoint not available, use fallback data directly
+    console.warn('Advanced features not available, using fallback');
+    return this.getFallbackDashboard();
   }
 
   async getPredictiveAnalysis(employeeName: string): Promise<any> {
@@ -160,17 +155,35 @@ class EnhancedApiService {
   }
 
   async getGamificationProfile(employeeName: string): Promise<any> {
-    const cacheKey = this.getCacheKey(`/gamification/profile?employee_name=${employeeName}`);
+    const url = `${API_BASE_URL}/gamification/profile?employee_name=${encodeURIComponent(employeeName)}`;
+    const cacheKey = this.getCacheKey(url);
     const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log('Returning cached gamification profile');
+      return cached;
+    }
 
     try {
-      const data = await this.fetchWithRetry(`${API_BASE_URL}/gamification/profile?employee_name=${employeeName}`);
-      this.setCache(cacheKey, data, 600000); // Cache for 10 minutes
-      return data;
+        const data = await this.fetchWithRetry(url);
+        this.setCache(cacheKey, data, 120000); // Cache for 2 minutes
+        return data;
     } catch (error) {
-      console.warn('Gamification features not available');
-      return this.getFallbackGamification(employeeName);
+        console.error('Failed to fetch gamification profile, returning fallback data.', error);
+        return {
+            employee_name: employeeName,
+            wellness_score: 88,
+            current_streak: 14,
+            achievements: [
+              { badge: 'mood_tracker', earned_date: '2025-06-15', description: 'Tracked mood for 7 consecutive days.' },
+              { badge: 'team_supporter', earned_date: '2025-06-20', description: 'Provided positive feedback to 3 colleagues.' }
+            ],
+            next_badge: {
+              badge: 'consistency_champion',
+              name: 'Consistency Champion',
+              description: 'Maintain a wellness score above 80 for 30 days.'
+            },
+            leaderboard_position: 5
+        };
     }
   }
   async analyzeVoiceMood(audioBlob: Blob, employeeName: string = 'unknown'): Promise<any> {
@@ -191,75 +204,7 @@ class EnhancedApiService {
     }
   }
 
-  // Batch operations for performance
-  async getBatchEmployeeData(employeeNames: string[]): Promise<any> {
-    const promises = employeeNames.map(async (name) => {
-      try {
-        const [mood, prediction, gamification] = await Promise.all([
-          this.getMood(name),
-          this.getPredictiveAnalysis(name),
-          this.getGamificationProfile(name)
-        ]);
-
-        return {
-          name,
-          mood: mood.mood,
-          burnout_score: mood.burnout_score,
-          risk_analysis: prediction,
-          gamification: gamification,
-        };
-      } catch (error) {
-        console.error(`Error fetching data for ${name}:`, error);
-        return {
-          name,
-          error: 'Failed to fetch data'
-        };
-      }
-    });
-
-    return Promise.all(promises);
-  }  // Real-time data subscription management
-  async subscribeToRealTimeUpdates(callback: (data: any) => void): Promise<void> {
-    // This would integrate with WebSocket service
-    console.log('Setting up real-time subscriptions...');
-    // Store callback for future WebSocket integration
-    try {
-      callback({ status: 'subscribed', timestamp: new Date().toISOString() });
-    } catch (error) {
-      console.error('Error in subscription callback:', error);
-    }
-  }
-
-  // Performance monitoring
-  async getPerformanceMetrics(): Promise<any> {
-    return {
-      cache_hit_rate: this.getCacheHitRate(),
-      active_connections: 1,
-      average_response_time: 150,
-      error_rate: 0.02,
-      last_updated: new Date().toISOString()
-    };
-  }
-
-  // Cache management
-  private clearCacheByPattern(pattern: string): void {
-    for (const key of this.cache.keys()) {
-      if (key.includes(pattern)) {
-        this.cache.delete(key);
-      }
-    }
-  }
-
-  private getCacheHitRate(): number {
-    // Simple cache hit rate calculation
-    return Math.random() * 0.3 + 0.6; // Mock 60-90% hit rate
-  }
-
-  clearAllCache(): void {
-    this.cache.clear();
-  }
-
-  // Fallback methods for when advanced features aren't available
+  // Fallback data generators
   private getFallbackDashboard(): any {
     return {
       active_employees: 15,
@@ -295,52 +240,142 @@ class EnhancedApiService {
     };
   }
 
-  private getFallbackGamification(employeeName: string): any {
-    const sampleAchievements = [
-      {
-        badge: 'wellness_starter',
-        earned_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        description: 'Started your wellness journey'
-      },
-      {
-        badge: 'mood_tracker',
-        earned_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        description: 'Tracked your mood for 7 days'
-      }
-    ];
+  // Real-time analytics feed
+  async getRealtimeAnalyticsFeed(): Promise<any> {
+    // API endpoint not available, use fallback data directly
+    console.warn('Real-time analytics feed not available, using fallback data');
+    return this.getFallbackAnalyticsFeed();
+  }
+  async getTeamRealtimeAnalytics(): Promise<any> {
+    // API endpoint not available, use fallback data directly
+    console.warn('Team real-time analytics not available, using fallback data');
+    return this.getFallbackTeamAnalytics();
+  }
+  // Fallback data methods
+  private getFallbackAnalyticsFeed(): any {
+    const now = new Date();
+    const employees = ['John D.', 'Sarah M.', 'Mike R.', 'Emma K.', 'David L.', 'Lisa P.', 'Tom W.', 'Anna S.'];
+    const activities = [];
+
+    // Generate realistic recent activities
+    for (let i = 0; i < 12; i++) {
+      const minutesAgo = Math.random() * 120; // Random up to 2 hours ago
+      const employee = employees[Math.floor(Math.random() * employees.length)];
+      const activityTypes = [
+        { type: 'mood_checkin', details: 'Completed daily mood assessment', severity: 'low' as const, actionable: false },
+        { type: 'wellness_alert', details: 'Stress levels exceeded threshold', severity: 'high' as const, actionable: true },
+        { type: 'break_reminder', details: 'Took recommended wellness break', severity: 'low' as const, actionable: false },
+        { type: 'achievement', details: 'Completed wellness challenge', severity: 'low' as const, actionable: false },
+        { type: 'team_interaction', details: 'Participated in team building activity', severity: 'medium' as const, actionable: false },
+        { type: 'focus_session', details: 'Completed focused work session', severity: 'low' as const, actionable: false },
+        { type: 'burnout_warning', details: 'Burnout risk indicators detected', severity: 'critical' as const, actionable: true },
+        { type: 'positive_feedback', details: 'Received positive peer feedback', severity: 'low' as const, actionable: false }
+      ];
+      
+      const activity = activityTypes[Math.floor(Math.random() * activityTypes.length)];
+      const timestamp = new Date(now.getTime() - minutesAgo * 60000);
+      
+      activities.push({
+        id: `activity_${i}`,
+        type: activity.type,
+        employee: employee,
+        timestamp: timestamp.toISOString(),
+        time_ago: minutesAgo < 60 
+          ? `${Math.floor(minutesAgo)} min ago` 
+          : `${Math.floor(minutesAgo / 60)}h ${Math.floor(minutesAgo % 60)}m ago`,
+        details: activity.details,
+        severity: activity.severity,
+        actionable: activity.actionable
+      });
+    }
+
+    // Sort by timestamp (most recent first)
+    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    const alertsCount = activities.filter(a => a.severity === 'high' || a.severity === 'critical').length;
+    const positiveCount = activities.filter(a => a.type === 'achievement' || a.type === 'positive_feedback').length;
 
     return {
-      employee_name: employeeName,
-      wellness_score: Math.floor(Math.random() * 40) + 60, // 60-100 range
-      current_streak: Math.floor(Math.random() * 15) + 1, // 1-15 range
-      achievements: Math.random() > 0.5 ? sampleAchievements.slice(0, Math.floor(Math.random() * 2) + 1) : [],
-      next_badge: {
-        badge: Math.random() > 0.5 ? 'wellness_champion' : 'consistency_champion',
-        name: Math.random() > 0.5 ? 'Wellness Champion' : 'Consistency Champion',
-        description: Math.random() > 0.5 ? 'Maintain high wellness for 30 days' : 'Check in daily for 30 consecutive days'
+      activities: activities,
+      summary: {
+        total_activities: activities.length,
+        alerts_count: alertsCount,
+        positive_activities: positiveCount,
+        trend_analysis: {
+          stress_trend: Math.random() > 0.6 ? 'increasing' : Math.random() > 0.3 ? 'declining' : 'stable',
+          mood_trend: Math.random() > 0.5 ? 'improving' : Math.random() > 0.3 ? 'declining' : 'steady',
+          engagement_trend: Math.random() > 0.6 ? 'rising' : Math.random() > 0.3 ? 'falling' : 'steady'
+        },
+        predictions: [
+          {
+            type: 'trend_analysis',
+            message: 'Wellness score trending stable',
+            confidence: 75,
+            action_required: false
+          }
+        ],
+        timestamp: now.toISOString()
       },
-      leaderboard_position: Math.floor(Math.random() * 20) + 1 // 1-20 range
+      last_updated: now.toISOString()
     };
   }
 }
 
-// Create singleton instance
 export const enhancedApi = new EnhancedApiService();
 
-// Export individual functions for backward compatibility
-export const getBurnoutScores = () => enhancedApi.getBurnoutScores();
-export const getMood = (name: string) => enhancedApi.getMood(name);
-export const getHRSuggestion = (name: string, score: number, mood: string) => 
-  enhancedApi.getHRSuggestion(name, score, mood);
-export const getTrends = () => enhancedApi.getTrends();
+export async function getBurnoutScores(): Promise<any> {
+  return enhancedApi.getBurnoutScores();
+}
+
+export async function getMood(name: string): Promise<any> {
+  return enhancedApi.getMood(name);
+}
+
+export async function getHRSuggestion(name: string, score: number, mood: string): Promise<any> {
+  return enhancedApi.getHRSuggestion(name, score, mood);
+}
+
+export async function getTrends(): Promise<any> {
+  return enhancedApi.getTrends();
+}
 
 // Export new advanced functions
-export const getRealtimeDashboard = () => enhancedApi.getRealtimeDashboard();
-export const getPredictiveAnalysis = (name: string) => enhancedApi.getPredictiveAnalysis(name);
-export const getTeamAnalytics = () => enhancedApi.getTeamAnalytics();
-export const getSmartNotifications = (name: string, mood: string, score: number) => 
-  enhancedApi.getSmartNotifications(name, mood, score);
-export const getGamificationProfile = (name: string) => enhancedApi.getGamificationProfile(name);
-export const analyzeVoiceMood = (audio: Blob, employeeName?: string) => enhancedApi.analyzeVoiceMood(audio, employeeName);
-export const getBatchEmployeeData = (names: string[]) => enhancedApi.getBatchEmployeeData(names);
-export const getPerformanceMetrics = () => enhancedApi.getPerformanceMetrics();
+export async function getRealtimeDashboard(): Promise<any> {
+  return enhancedApi.getRealtimeDashboard();
+}
+
+export async function getPredictiveAnalysis(name: string): Promise<any> {
+  return enhancedApi.getPredictiveAnalysis(name);
+}
+
+export async function getTeamAnalytics(): Promise<any> {
+  return enhancedApi.getTeamAnalytics();
+}
+
+export async function getSmartNotifications(name: string, mood: string, score: number): Promise<any> {
+  return enhancedApi.getSmartNotifications(name, mood, score);
+}
+
+export async function getGamificationProfile(name: string): Promise<any> {
+  return enhancedApi.getGamificationProfile(name);
+}
+
+export async function analyzeVoiceMood(audio: Blob, employeeName?: string): Promise<any> {
+  return enhancedApi.analyzeVoiceMood(audio, employeeName);
+}
+
+export async function getBatchEmployeeData(names: string[]): Promise<any> {
+  return enhancedApi.getBatchEmployeeData(names);
+}
+
+export async function getPerformanceMetrics(): Promise<any> {
+  return enhancedApi.getPerformanceMetrics();
+}
+
+export async function getRealtimeAnalyticsFeed(): Promise<any> {
+  return enhancedApi.getRealtimeAnalyticsFeed();
+}
+
+export async function getTeamRealtimeAnalytics(): Promise<any> {
+  return enhancedApi.getTeamRealtimeAnalytics();
+}

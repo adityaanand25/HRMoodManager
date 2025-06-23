@@ -127,69 +127,67 @@ export const TeamDynamicsAnalyzer: React.FC<TeamDynamicsAnalyzerProps> = ({
     ];
 
     return (
-      <div className="relative bg-gray-50 rounded-xl p-6" style={{ height: '400px' }}>
-        <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0">
+      <div className="relative bg-gray-50 rounded-xl p-4 sm:p-6 min-h-[300px] sm:min-h-[400px]">
+        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
           {/* Connections */}
-          {teamData.connections.map((connection, index) => {
-            const fromPos = positions[parseInt(connection.from) - 1];
-            const toPos = positions[parseInt(connection.to) - 1];
+          {teamData.connections.map((conn, index) => {
+            const fromIndex = teamData.members.findIndex(m => m.id === conn.from);
+            const toIndex = teamData.members.findIndex(m => m.id === conn.to);
+
+            if (fromIndex === -1 || toIndex === -1 || fromIndex >= positions.length || toIndex >= positions.length) {
+              return null;
+            }
+
+            const p1 = positions[fromIndex];
+            const p2 = positions[toIndex];
+
+            if (!p1 || !p2) {
+              return null;
+            }
+
             return (
               <line
                 key={index}
-                x1={fromPos.x}
-                y1={fromPos.y}
-                x2={toPos.x}
-                y2={toPos.y}
-                stroke={getConnectionColor(connection.type)}
-                strokeWidth={connection.strength * 3}
+                x1={p1.x}
+                y1={p1.y}
+                x2={p2.x}
+                y2={p2.y}
+                stroke={getConnectionColor(conn.type)}
+                strokeWidth={conn.strength * 3}
                 opacity={0.6}
               />
             );
           })}
-          
-          {/* Nodes */}
+        </svg>
+
+        {/* Members */}
+        <div className="relative w-full h-full">
           {teamData.members.map((member, index) => {
+            if (index >= positions.length) return null;
             const pos = positions[index];
+            if (!pos) return null; // Defensive check
+
             return (
-              <g key={member.id}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={getInfluenceSize(member.influence) / 5}
-                  fill="#3B82F6"
-                  opacity={0.8}
-                  className="cursor-pointer hover:opacity-100"
-                  onClick={() => setSelectedMember(member)}
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y + 8}
-                  textAnchor="middle"
-                  className="text-xs fill-white font-medium pointer-events-none"
-                >
-                  {member.name.split(' ')[0]}
-                </text>
-              </g>
+              <div
+                key={member.id}
+                className="absolute cursor-pointer"
+                style={{
+                  left: `${pos.x}%`,
+                  top: `${pos.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: `${getInfluenceSize(member.influence)}px`,
+                  height: `${getInfluenceSize(member.influence)}px`,
+                }}
+                onClick={() => setSelectedMember(member)}
+              >
+                <div className={`w-full h-full rounded-full bg-blue-500 opacity-80 hover:opacity-100 transition-opacity`}>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs text-white font-medium">{member.name.split(' ')[0]}</span>
+                </div>
+              </div>
             );
           })}
-        </svg>
-        
-        {/* Legend */}
-        <div className="absolute bottom-2 left-2 bg-white rounded-lg p-2 shadow-sm text-xs">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-0.5 bg-green-500"></div>
-              <span>Collaboration</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-0.5 bg-blue-500"></div>
-              <span>Mentorship</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-0.5 bg-purple-500"></div>
-              <span>Support</span>
-            </div>
-          </div>
         </div>
       </div>
     );
