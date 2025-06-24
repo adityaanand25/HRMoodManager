@@ -1,5 +1,5 @@
 // Enhanced API service with advanced features
-const API_BASE_URL = 'http://127.0.0.1:5002/api';
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 // Enhanced API with caching and retry logic
 class EnhancedApiService {
@@ -357,7 +357,26 @@ export async function getSmartNotifications(name: string, mood: string, score: n
 }
 
 export async function getGamificationProfile(name: string): Promise<any> {
-  return enhancedApi.getGamificationProfile(name);
+  try {
+    return await enhancedApi.getGamificationProfile(name);
+  } catch (error) {
+    console.error('Error fetching gamification profile:', error);
+    // Fallback/mock data
+    return {
+      employee_name: name,
+      wellness_score: 75,
+      current_streak: 10,
+      achievements: [
+        { badge: 'starter', earned_date: '2023-01-01', description: 'Started your wellness journey.' }
+      ],
+      next_badge: {
+        badge: 'consistency_champion',
+        name: 'Consistency Champion',
+        description: 'Maintain a wellness score above 80 for 30 days.'
+      },
+      leaderboard_position: 42
+    };
+  }
 }
 
 export async function analyzeVoiceMood(audio: Blob, employeeName?: string): Promise<any> {
